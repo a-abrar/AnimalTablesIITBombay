@@ -3,46 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Tables</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="styles.css">
-    <title>Animal Tables</title>
 </head>
 <body>
-    <div class="container my-4">
+    <div class="container">
         <h1 class="text-center">Animal Tables</h1>
 
-        <!-- Big Cats Table -->
-        <section class="my-5">
-            <h2>Big Cats</h2>
-            <table class="table table-striped table-bordered" id="bigCatsTable"></table>
-        </section>
+        <div id="tablesContainer"></div>
 
-        <!-- Dogs Table -->
-        <section class="my-5">
-            <h2>Dogs</h2>
-            <table class="table table-striped table-bordered" id="dogsTable"></table>
-        </section>
-
-        <!-- Big Fish Table -->
-        <section class="my-5">
-            <h2>Big Fish</h2>
-            <table class="table table-striped table-bordered" id="bigFishTable"></table>
-        </section>
-
-        <!-- Form to Add Animals -->
-        <section class="my-5">
-            <h3>Add Animal</h3>
-            <form id="animalForm" class="form-inline justify-content-center">
-                <input type="text" class="form-control mx-2" id="species" placeholder="Species" required>
-                <input type="text" class="form-control mx-2" id="name" placeholder="Name" required>
-                <input type="number" class="form-control mx-2" id="size" placeholder="Size (ft)" required>
-                <input type="text" class="form-control mx-2" id="location" placeholder="Location" required>
-                <input type="text" class="form-control mx-2" id="imageUrl" placeholder="Image Filename (e.g., tiger.jpg)">
-                <button type="submit" class="btn btn-primary">Add Animal</button>
-            </form>
-        </section>
+        <form id="animalForm" class="mt-5">
+            <h3>Add New Animal</h3>
+            <label for="species">Species:</label>
+            <input type="text" id="species" placeholder="E.g., Big Cats, Dogs" required>
+            <label for="name">Name:</label>
+            <input type="text" id="name" placeholder="E.g., Tiger, Labrador" required>
+            <label for="size">Size (ft):</label>
+            <input type="number" id="size" placeholder="E.g., 10" required>
+            <label for="location">Location:</label>
+            <input type="text" id="location" placeholder="E.g., Asia, Germany" required>
+            <label for="imageUrl">Image URL:</label>
+            <input type="url" id="imageUrl" placeholder="E.g., tiger.jpg">
+            <button type="submit">Add Animal</button>
+        </form>
     </div>
 
-    <script src="script.js"></script> <!-- Use script.js for simplicity -->
+    <script src="script.js"></script>
 </body>
 </html>

@@ -1,160 +1,204 @@
-// Class to represent an animal
-class Animal {
-  constructor(species, name, size, location, image) {
-    this.species = species;
-    this.name = name;
-    this.size = size;
-    this.location = location;
-    this.image = image;
+/* I have added comments for OOPs concepts usage. This is a basic js file for the project we can
+enhance this more to properly simulate all the functionality. */
+
+const initialData = {
+  "Big Cats": [
+      { name: "Tiger", size: 10, location: "Asia", imageUrl: "./images/tiger.jpg" },
+      { name: "Lion", size: 8, location: "Africa", imageUrl:"./images/lion.jpg" },
+      { name:"Leopard", size :5 , location :"Africa and Asia", imageUrl:"./images/leopard.jpg"},
+      { name:"Cheetah", size :5 , location :"Africa", imageUrl:"./images/cheetah.jpg"},
+      { name:"Caracal", size :3 , location :"Africa", imageUrl:"./images/caracal.jpg"},
+      { name:"Jaguar", size :5 , location :"Amazon", imageUrl:"./images/jaguar.jpg"}
+  ],
+  "Dogs": [
+      { name:"Rottweiler", size :2 , location :"Germany", imageUrl:"./images/rottweiler.jpg"},
+      { name:"German Shepherd", size :2 , location :"Germany", imageUrl:"./images/german-shepherd.jpg"},
+      { name:"Labrador", size :2 , location :"UK", imageUrl:"./images/labrador.jpg"},
+      { name:"Alabai", size :4 , location :"Turkey", imageUrl:"./images/alabai.jpg"}
+  ],
+  "Big Fish": [
+      { name:"Humpback Whale", size :15 , location :"Atlantic Ocean", imageUrl:"./images/humpback-whale.jpg"},
+      { name:"Killer Whale", size :12 , location :"Atlantic Ocean", imageUrl:"./images/killer-whale.jpg"},
+      { name:"Tiger Shark", size :8 , location :"Ocean", imageUrl:"./images/tiger-shark.jpg"},
+      { name:"Hammerhead Shark", size :8 , location :"Ocean", imageUrl:"./images/hammerhead-shark.jpg"}
+  ]
+};
+
+const tablesContainer = document.getElementById("tablesContainer");
+
+// Encapsulation: Each table's rendering logic is encapsulated within this function
+function createTable(species, animals) {
+  const section = document.createElement("section");
+  section.classList.add("my-5");
+
+  const heading = document.createElement("h2");
+  heading.textContent = species;
+  section.appendChild(heading);
+
+  const sortButtons = document.createElement("div");
+  sortButtons.classList.add("mb-3");
+  sortButtons.innerHTML = `
+     ${species === 'Big Cats' ? `
+     <button class='sort-button' onclick='sortAnimals("${species}", "name")'>Sort by Name</button>
+     <button class='sort-button' onclick='sortAnimals("${species}", "size")'>Sort by Size</button>
+     <button class='sort-button' onclick='sortAnimals("${species}", "location")'>Sort by Location</button>` : ''}
+     ${species === 'Dogs' ? `
+     <button class='sort-button' onclick='sortAnimals("${species}", "name")'>Sort by Name</button>
+     <button class='sort-button' onclick='sortAnimals("${species}", "location")'>Sort by Location</button>` : ''}
+     ${species === 'Big Fish' ? `
+     <button class='sort-button' onclick='sortAnimals("${species}", "size")'>Sort by Size</button>` : ''}
+  `;
+  section.appendChild(sortButtons);
+
+  const table = document.createElement("table");
+  table.classList.add("table", "table-bordered");
+
+  const thead = document.createElement("thead");
+  thead.innerHTML = `
+     <tr>
+        <th>Name</th>
+        <th>Size (ft)</th>
+        <th>Location</th>
+        <th>Image</th>
+        <th>Action</th>
+     </tr>`;
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  animals.forEach((animal) => {
+     const row = document.createElement("tr");
+     row.innerHTML = `
+        <td class="${
+            species === 'Dogs' 
+              ? 'bold' 
+              : species === 'Big Fish' 
+                ? 'blue-italic bold' 
+                : ''}">
+            ${animal.name}
+        </td>
+        <td>${animal.size}</td>
+        <td>${animal.location}</td>
+        <td><img src="${animal.imageUrl}" alt="${animal.name}"></td>
+        <td>
+           <button class='action-button' onclick='editAnimal("${species}", "${animal.name}")'>Edit</button>
+           <button class='action-button delete' onclick='deleteAnimal("${species}", "${animal.name}")'>Delete</button>
+        </td>`;
+     tbody.appendChild(row);
+  });
+  
+  table.appendChild(tbody);
+  section.appendChild(table);
+  tablesContainer.appendChild(section);
+}
+
+function renderTables() {
+  tablesContainer.innerHTML = "";
+  for (const [species, animals] of Object.entries(initialData)) {
+     if (animals.length > 0) {
+        createTable(species, animals);
+     }
   }
 }
 
-// Class to manage animal tables
-class AnimalTable {
-  constructor(tableId, sortFields) {
-    this.tableId = tableId; // ID of the table
-    this.animals = []; // Store animal objects
-    this.sortOrder = {}; // Track sort order for each field
-    sortFields.forEach(field => this.sortOrder[field] = 'asc'); // Initialize sort order
-    this.sortFields = sortFields; // Fields allowed for sorting
+/**
+ * Event listener for form submission.
+ * Handles adding new animals with validation.
+ */
+document.getElementById("animalForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  
+  const species = document.getElementById("species").value.trim();
+  const name = document.getElementById("name").value.trim();
+  const size = parseInt(document.getElementById("size").value.trim());
+  const location = document.getElementById("location").value.trim();
+  const imageUrl = document.getElementById("imageUrl").value.trim() || "./images/default.jpg";
+  
+  if (!species || !name || !size || !location) {
+    alert("All fields are required!");
+    return;
   }
 
-  // Add an animal to the table
-  addAnimal(animal) {
-    if (!this.validateAnimal(animal)) return; // Validate animal
-    if (this.animals.find(a => a.name.toLowerCase() === animal.name.toLowerCase())) {
-      alert("Duplicate animal names are not allowed!");
+  if (size <= 0) {
+    alert("Size must be a positive number!");
+    return;
+  }
+
+  if (initialData[species] && initialData[species].some(animal => animal.name.toLowerCase() === name.toLowerCase())) {
+    alert(`An animal named "${name}" already exists in the "${species}" category.`);
+    return;
+  }
+
+  if (!initialData[species]) {
+    initialData[species] = [];
+  }
+  
+  initialData[species].push({ name, size, location, imageUrl });
+  renderTables();
+
+  e.target.reset();
+});
+
+function deleteAnimal(species, name) {
+  initialData[species] = initialData[species].filter(animal => animal.name !== name);
+  
+  if (initialData[species].length === 0) {
+     delete initialData[species];
+  }
+  
+  renderTables();
+}
+
+function editAnimal(species, oldName) {
+  const animalIndex = initialData[species].findIndex(animal => animal.name === oldName);
+  
+  if (animalIndex !== -1) {
+    const animal = initialData[species][animalIndex];
+
+    const newName = prompt("Edit Name:", animal.name);
+    const newSize = prompt("Edit Size:", animal.size);
+    const newLocation = prompt("Edit Location:", animal.location);
+    const newImageUrl = prompt("Edit Image URL:", animal.imageUrl) || "./images/default.jpg";
+
+    if (!newName || !newSize || !newLocation) {
+      alert("All fields are required!");
       return;
     }
-    this.animals.push(animal); // Add the animal
-    this.render(); // Re-render the table
-  }
 
-  // Validate animal input
-  validateAnimal(animal) {
-    if (!animal.name || !animal.species || !animal.size || !animal.location) {
-      alert("All fields are required!");
-      return false;
+    const sizeAsNumber = Number(newSize);
+    if (sizeAsNumber <= 0 || isNaN(sizeAsNumber)) {
+      alert("Size must be a positive number!");
+      return;
     }
-    if (isNaN(animal.size) || animal.size <= 0) {
-      alert("Size must be a valid number greater than 0!");
-      return false;
+
+    if (
+      initialData[species].some(
+        (animal, index) =>
+          index !== animalIndex && animal.name.toLowerCase() === newName.toLowerCase()
+      )
+    ) {
+      alert(`An animal named "${newName}" already exists in the "${species}" category.`);
+      return;
     }
-    return true;
-  }
 
-  // Delete an animal by name
-  deleteAnimal(name) {
-    this.animals = this.animals.filter(a => a.name !== name);
-    this.render(); // Re-render the table
-  }
+    initialData[species][animalIndex] = {
+      name: newName,
+      size: sizeAsNumber,
+      location: newLocation,
+      imageUrl: newImageUrl,
+    };
 
-  // Edit an animal by name
-  editAnimal(name) {
-    const animal = this.animals.find(a => a.name === name);
-    if (animal) {
-      const newSpecies = prompt("Enter new species:", animal.species) || animal.species;
-      const newName = prompt("Enter new name:", animal.name) || animal.name;
-      const newSize = prompt("Enter new size (ft):", animal.size) || animal.size;
-      const newLocation = prompt("Enter new location:", animal.location) || animal.location;
-
-      // Validate changes
-      if (isNaN(newSize) || newSize <= 0) {
-        alert("Size must be a valid number greater than 0!");
-        return;
-      }
-
-      // Update animal
-      animal.species = newSpecies;
-      animal.name = newName;
-      animal.size = newSize;
-      animal.location = newLocation;
-      this.render();
-    }
-  }
-
-  // Sort the animals based on a specific field
-  sortBy(field) {
-    if (!this.sortFields.includes(field)) return; // Skip sorting if field is not allowed
-    const order = this.sortOrder[field];
-    this.animals.sort((a, b) => {
-      if (a[field] > b[field]) return order === 'asc' ? 1 : -1;
-      if (a[field] < b[field]) return order === 'asc' ? -1 : 1;
-      return 0;
-    });
-    this.sortOrder[field] = order === 'asc' ? 'desc' : 'asc'; // Toggle sort order
-    this.render();
-  }
-
-  // Render the table
-  render() {
-    const table = document.getElementById(this.tableId);
-    table.innerHTML = `
-      <thead>
-        <tr>
-          ${Object.keys(this.animals[0] || {}).map(field => `
-            <th>
-              ${field.charAt(0).toUpperCase() + field.slice(1)}
-              ${this.sortFields.includes(field) ? `<button onclick="${this.tableId}.sortBy('${field}')">Sort</button>` : ''}
-            </th>`).join('')}
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${this.animals.map(animal => `
-          <tr>
-            <td>${animal.species}</td>
-            <td style="${this.getNameStyle()}">${animal.name}</td>
-            <td>${animal.size}</td>
-            <td>${animal.location}</td>
-            <td>
-              <img src="./images/${animal.image}" alt="${animal.name}" 
-                style="width: 100px; height: auto; border: 2px solid black;" 
-                onmouseover="this.style.transform='scale(1.5)';" 
-                onmouseout="this.style.transform='scale(1)';">
-            </td>
-            <td>
-              <button onclick="${this.tableId}.deleteAnimal('${animal.name}')">Delete</button>
-              <button onclick="${this.tableId}.editAnimal('${animal.name}')">Edit</button>
-            </td>
-          </tr>`).join('')}
-      </tbody>`;
-  }
-
-  // Get name style based on table type
-  getNameStyle() {
-    if (this.tableId === 'dogsTable') return 'font-weight: bold;';
-    if (this.tableId === 'bigFishTable') return 'font-weight: bold; font-style: italic; color: blue;';
-    return '';
+    renderTables();
   }
 }
 
-// Create table instances
-const bigCatsTable = new AnimalTable("bigCatsTable", ["species", "name", "size", "location"]);
-const dogsTable = new AnimalTable("dogsTable", ["name", "location"]);
-const bigFishTable = new AnimalTable("bigFishTable", ["size"]);
+function sortAnimals(species, key) {
+    if (key === 'size') {
+       initialData[species].sort((a, b) => a.size - b.size);
+    } else { 
+       initialData[species].sort((a, b) => a[key].localeCompare(b[key]));
+    }
+    
+    renderTables();
+}
 
-// Add sample data for Big Cats
-bigCatsTable.addAnimal(new Animal("Big Cats", "Tiger", 10, "Asia", "tiger.jpg"));
-bigCatsTable.addAnimal(new Animal("Big Cats", "Lion", 8, "Africa", "lion.jpg"));
-bigCatsTable.addAnimal(new Animal("Big Cats", "Leopard", 5, "Africa and Asia", "leopard.jpg"));
-bigCatsTable.addAnimal(new Animal("Big Cats", "Cheetah", 5, "Africa", "cheetah.jpg"));
-bigCatsTable.addAnimal(new Animal("Big Cats", "Caracal", 3, "Africa", "caracal.jpg"));
-bigCatsTable.addAnimal(new Animal("Big Cats", "Jaguar", 5, "Amazon", "jaguar.jpg"));
-
-// Add sample data for Dogs
-dogsTable.addAnimal(new Animal("Dog", "Rottweiler", 2, "Germany", "rottweiler.jpg"));
-dogsTable.addAnimal(new Animal("Dog", "German Shepherd", 2, "Germany", "german-shepherd.jpg"));
-dogsTable.addAnimal(new Animal("Dog", "Labrador", 2, "UK", "labrador.jpg"));
-dogsTable.addAnimal(new Animal("Dog", "Alabai", 4, "Turkey", "alabai.jpg"));
-
-// Add sample data for Big Fish
-bigFishTable.addAnimal(new Animal("Big Fish", "Humpback Whale", 15, "Atlantic Ocean", "humpback-whale.jpg"));
-bigFishTable.addAnimal(new Animal("Big Fish", "Killer Whale", 12, "Atlantic Ocean", "killer-whale.jpg"));
-bigFishTable.addAnimal(new Animal("Big Fish", "Tiger Shark", 8, "Ocean", "tiger-shark.jpg"));
-bigFishTable.addAnimal(new Animal("Big Fish", "Hammerhead Shark", 8, "Ocean", "hammerhead-shark.jpg"));
-
-// Expose tables globally for sorting
-window.bigCatsTable = bigCatsTable;
-window.dogsTable = dogsTable;
-window.bigFishTable = bigFishTable;
+renderTables();
