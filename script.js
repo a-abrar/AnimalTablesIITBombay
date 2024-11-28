@@ -1,6 +1,18 @@
 /* I have added comments for OOPs concepts usage. This is a basic js file for the project we can
 enhance this more to properly simulate all the functionality. */
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then((registration) => {
+        console.log('Service Worker registered with scope:', registration.scope);
+      })
+      .catch((error) => {
+        console.log('Service Worker registration failed:', error);
+      });
+  });
+}
+
 const initialData = {
   "Big Cats": [
       { name: "Tiger", size: 10, location: "Asia", imageUrl: "./images/tiger.jpg" },

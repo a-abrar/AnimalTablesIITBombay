@@ -147,3 +147,30 @@ table tr {
 table tr:hover {
   background-color: rgba(0, 123, 255, 0.1);
 }
+
+@media screen and (max-width: 768px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  table {
+    font-size: 0.85rem;
+  }
+
+  table th,
+  table td {
+    padding: 8px;
+  }
+
+  form input,
+  form button {
+    min-width: 100%;
+    margin-bottom: 15px;
+  }
+
+  .sort-button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
